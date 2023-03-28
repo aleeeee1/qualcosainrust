@@ -5,8 +5,8 @@ use models::{dati_concorso::DatiConcorso, giocata::Giocata, giocata_computed::Gi
 use rand::{rngs::ThreadRng, Rng};
 use utils::utils::get_giocate;
 
-static mut GIOCATE1_E: i32 = 0;
-static mut GIOCATE2_E: i32 = 0;
+static mut GIOCATE_1E: i32 = 0;
+static mut GIOCATE_2E: i32 = 0;
 static mut MOST_FREQ: Vec<i32> = Vec::new();
 
 fn generate_random_numbers(mut random_coso: ThreadRng) -> Vec<i32> {
@@ -31,11 +31,11 @@ fn generate_extration() -> Vec<i32> {
 
         if giocata.get_puntata() == 1 {
             unsafe {
-                GIOCATE1_E += 1;
+                GIOCATE_1E += 1;
             }
         } else {
             unsafe {
-                GIOCATE2_E += 1;
+                GIOCATE_2E += 1;
             }
         }
 
@@ -79,8 +79,8 @@ fn main() {
     let giocate = get_giocate();
     let estrazione = generate_extration();
 
-    let mut guadagno_1e = unsafe { GIOCATE1_E };
-    let mut guadagno_2e = unsafe { GIOCATE2_E * 2 };
+    let mut guadagno_1e = unsafe { GIOCATE_1E };
+    let mut guadagno_2e = unsafe { GIOCATE_2E * 2 };
 
     for mut giocata in giocate {
         let giocata_computed = GiocataComputed::new(&mut giocata, estrazione.clone());
