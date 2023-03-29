@@ -2,17 +2,13 @@ use crate::utils::utils::*;
 use crate::DatiConcorso;
 
 pub struct Giocata {
-    dati_concorso: *mut DatiConcorso,
+    dati_concorso: DatiConcorso,
     puntata: i32,
     numeri_giocati: Vec<i32>,
 }
 
 impl Giocata {
-    pub fn new(
-        dati_concorso: &mut DatiConcorso,
-        puntata: i32,
-        numeri_giocati: Vec<i32>,
-    ) -> Giocata {
+    pub fn new(dati_concorso: DatiConcorso, puntata: i32, numeri_giocati: Vec<i32>) -> Giocata {
         let giocata = Giocata {
             dati_concorso,
             puntata: puntata,
@@ -24,13 +20,13 @@ impl Giocata {
 
     pub fn from_line(line: String) -> Giocata {
         let mut infos = line.split(";");
-        let mut dati_concorso = DatiConcorso::new(
+        let dati_concorso = DatiConcorso::new(
             infos.next().unwrap().parse().unwrap(),
             infos.next().unwrap().parse().unwrap(),
         );
 
         let giocata = Giocata {
-            dati_concorso: &mut dati_concorso,
+            dati_concorso: dati_concorso,
             puntata: infos.next().unwrap().parse().unwrap(),
             numeri_giocati: infos
                 .next()
@@ -43,7 +39,18 @@ impl Giocata {
         return giocata;
     }
 
-    pub fn effettua_giocata(&self) {
+    pub fn effettua_giocata(&mut self) {
+        let stringa = self.to_string() + "\n";
+
+        append_to_file("righe_concorso.txt", &stringa);
+
+        self.dati_concorso.increment_numero_matrice();
+        self.dati_concorso
+            .save_to_file()
+            .expect("Qualcosa è andato storto");
+    }
+
+    pub fn to_string(&self) -> String {
         let numeri_giocati_string = self
             .numeri_giocati
             .iter()
@@ -53,22 +60,14 @@ impl Giocata {
 
         let puntata_string = self.puntata.to_string();
 
-        unsafe {
-            let stringa = format!(
-                "{};{};{};{}\n",
-                (*self.dati_concorso).get_numero_concorso().to_string(),
-                (*self.dati_concorso).get_numero_matrice().to_string(),
-                puntata_string,
-                numeri_giocati_string,
-            );
-
-            append_to_file("righe_concorso.txt", &stringa);
-
-            (*self.dati_concorso).increment_numero_matrice();
-            (*self.dati_concorso)
-                .save_to_file()
-                .expect("Qualcosa è andato storto");
-        };
+        let stringa = format!(
+            "{};{};{};{}",
+            self.dati_concorso.get_numero_concorso().to_string(),
+            self.dati_concorso.get_numero_matrice().to_string(),
+            puntata_string,
+            numeri_giocati_string,
+        );
+        return stringa;
     }
 
     pub fn get_puntata(&self) -> i32 {

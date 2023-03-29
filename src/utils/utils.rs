@@ -40,7 +40,10 @@ pub fn get_giocate() -> Vec<Giocata> {
     let mut giocate: Vec<Giocata> = Vec::new();
 
     for linea in linee {
-        let giocata = Giocata::from_line(linea.to_string());
+        if linea == "\n" || linea == "" {
+            continue;
+        }
+        let giocata: Giocata = Giocata::from_line(linea.to_string());
         giocate.push(giocata);
     }
 
